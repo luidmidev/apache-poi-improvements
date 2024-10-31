@@ -26,15 +26,15 @@ class TestWorkbook {
 
 
         var style = CellStylizer.init()
-                .withFontColor(IndexedColors.RED)
-                .withFontBold()
-                .withFontSize(8)
-                .withFontName("Arial")
+                .fontColor(IndexedColors.RED)
+                .fontBold()
+                .fontSize(8)
+                .fontName("Arial")
                 .foregroundColor(IndexedColors.YELLOW, FillPatternType.SOLID_FOREGROUND)
-                .withAlignment(HorizontalAlignment.CENTER)
-                .withAlignment(VerticalAlignment.CENTER)
+                .alignment(HorizontalAlignment.CENTER)
+                .alignment(VerticalAlignment.CENTER)
                 .allBorders(BorderStyle.THIN)
-                .withWrapText();
+                .wrapText();
 
         var currentTimeMillis = System.currentTimeMillis();
 

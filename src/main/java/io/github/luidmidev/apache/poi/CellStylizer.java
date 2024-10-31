@@ -88,41 +88,41 @@ public class CellStylizer {
         return this;
     }
 
-    public CellStylizer withFontColor(IndexedColors indexedColors) {
-        return withFontColor(indexedColors.getIndex());
+    public CellStylizer fontColor(IndexedColors indexedColors) {
+        return fontColor(indexedColors.getIndex());
     }
 
-    public CellStylizer withFontColor(short index) {
+    public CellStylizer fontColor(short index) {
         consumers.add(holder -> holder.getFont().setColor(index));
         return this;
     }
 
-    public CellStylizer withFontBold() {
+    public CellStylizer fontBold() {
         consumers.add(holder -> holder.getFont().setBold(true));
         return this;
     }
 
-    public CellStylizer withFontSize(int fontSize) {
+    public CellStylizer fontSize(int fontSize) {
         consumers.add(holder -> holder.getFont().setFontHeightInPoints((short) fontSize));
         return this;
     }
 
-    public CellStylizer withFontName(String fontName) {
+    public CellStylizer fontName(String fontName) {
         consumers.add(holder -> holder.getFont().setFontName(fontName));
         return this;
     }
 
-    public CellStylizer withAlignment(HorizontalAlignment horizontalAlignment) {
+    public CellStylizer alignment(HorizontalAlignment horizontalAlignment) {
         consumers.add(holder -> holder.getStyle().setAlignment(horizontalAlignment));
         return this;
     }
 
-    public CellStylizer withAlignment(VerticalAlignment verticalAlignment) {
+    public CellStylizer alignment(VerticalAlignment verticalAlignment) {
         consumers.add(holder -> holder.getStyle().setVerticalAlignment(verticalAlignment));
         return this;
     }
 
-    public CellStylizer withWrapText() {
+    public CellStylizer wrapText() {
         consumers.add(holder -> holder.getStyle().setWrapText(true));
         return this;
     }
