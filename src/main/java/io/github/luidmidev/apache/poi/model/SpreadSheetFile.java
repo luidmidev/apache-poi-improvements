@@ -4,10 +4,13 @@ package io.github.luidmidev.apache.poi.model;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Represents a spreadsheet file
+ */
 @Setter
 @Getter
-public class ReportFile {
+public class SpreadSheetFile {
     private String filename;
-    private String mediaType;
+    private WorkbookType type;
     private byte[] content;
 }

@@ -1,8 +1,6 @@
 package io.github.luidmidev.apache.poi;
 
-import io.github.luidmidev.apache.poi.model.ReportFile;
-import io.github.luidmidev.apache.poi.model.WorkbookType;
-import io.github.luidmidev.apache.poi.utils.WorkbookUtils;
+import io.github.luidmidev.apache.poi.model.SpreadSheetFile;
 import org.apache.poi.ss.usermodel.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +22,6 @@ class TestWorkbook {
 
         System.out.println("Time on generate list: " + (System.currentTimeMillis() - timeMillis));
 
-
         var style = CellStylizer.init()
                 .fontColor(IndexedColors.RED)
                 .fontBold()
@@ -38,24 +35,25 @@ class TestWorkbook {
 
         var currentTimeMillis = System.currentTimeMillis();
 
-        var workbookForReport = WorkbookManager.fromItems(persons)
-                .withColumn("Name", Person::name, style)
-                .withColumn("Complete Name", person -> person.name() + " \n" + person.lastName(), style)
-                .withColumn("Age", Person::age, style)
-                .withColumn("Address", Person::address, style)
-                .withColumn("Email", Person::email, style)
-                .withColumn("Phone", Person::phone, style)
-                .withHeaderStyle(style)
-                .configureSheet(sheet -> {
-                    sheet.autoSizeColumn(0);
-                    sheet.autoSizeColumn(1);
-                    sheet.autoSizeColumn(2);
-                    sheet.autoSizeColumn(3);
-                    sheet.autoSizeColumn(4);
-                    sheet.autoSizeColumn(5);
-                })
-                .forEachRow((row, person) -> WorkbookUtils.adjustRowHeightByLines(row))
-                .build();
+        var workbookForReport = WorkbookListMapper.from(persons)
+                .map((manager, customizer) -> customizer
+                        .withColumn("Name", Person::name, style)
+                        .withColumn("Complete Name", person -> person.name() + " \n" + person.lastName(), style)
+                        .withColumn("Age", Person::age, style)
+                        .withColumn("Address", Person::address, style)
+                        .withColumn("Email", Person::email, style)
+                        .withColumn("Phone", Person::phone, style)
+                        .withHeaderStyle(style)
+                        .forEachRow((row, person) -> WorkbookManagerUtils.adjustRowHeightByLines(row, manager.getEvaluator()))
+                        .configureSheet(sheet -> {
+                            sheet.autoSizeColumn(0);
+                            sheet.autoSizeColumn(1);
+                            sheet.autoSizeColumn(2);
+                            sheet.autoSizeColumn(3);
+                            sheet.autoSizeColumn(4);
+                            sheet.autoSizeColumn(5);
+                        })
+                );
 
         try (workbookForReport) {
 
@@ -86,20 +84,21 @@ class TestWorkbook {
         System.out.println("Time on load template: " + (System.currentTimeMillis() - b));
 
         var c = System.currentTimeMillis();
-        var wookbook = new WorkbookManager(templateRource, WorkbookType.XLSX);
+        var wookbook = new WorkbookManager(templateRource);
         System.out.println("Time on create workbook: " + (System.currentTimeMillis() - c));
 
         var d = System.currentTimeMillis();
-        WorkbookManager workbookForReport = WorkbookManager.fromItems(persons, wookbook, 3)
-                .configureSheet(sheet -> sheet.setColumnWidth(0, 5000))
-                .withColumn("Name", Person::name)
-                .withColumn("Complete Name", person -> person.name() + " " + person.lastName())
-                .withColumn("Age", Person::age)
-                .withColumn("Address", Person::address)
-                .withColumn("Email", Person::email)
-                .withColumn("Phone", Person::phone)
-                .onProgress((current, total) -> System.out.println("Progress: " + current + " of " + total))
-                .build();
+        var workbookForReport = WorkbookListMapper.from(persons, wookbook, 3)
+                .map((manager, configuration) -> configuration
+                        .configureSheet(sheet -> sheet.setColumnWidth(0, 5000))
+                        .onProgress((current, total) -> System.out.println("Progress: " + current + " of " + total))
+                        .withColumn("Name", Person::name)
+                        .withColumn("Complete Name", person -> person.name() + " " + person.lastName())
+                        .withColumn("Age", Person::age)
+                        .withColumn("Address", Person::address)
+                        .withColumn("Email", Person::email)
+                        .withColumn("Phone", Person::phone)
+                );
 
         try (workbookForReport) {
 
@@ -115,7 +114,7 @@ class TestWorkbook {
     }
 
 
-    private void save(ReportFile report) throws FileNotFoundException {
+    private void save(SpreadSheetFile report) throws FileNotFoundException {
 
         var file = new java.io.File(report.getFilename());
         try (var fos = new java.io.FileOutputStream(file)) {
