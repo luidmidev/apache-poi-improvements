@@ -6,11 +6,12 @@
 
     <groupId>io.github.luidmidev</groupId>
     <artifactId>apache-poi-improvements</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 
     <description>
         Apache POI Improvements Library
     </description>
+
     <url>https://github.com/luidmidev/apache-poi-improvements.git</url>
 
     <licenses>
@@ -27,6 +28,13 @@
             <email>playerluis159@gmail.com</email>
         </developer>
     </developers>
+
+    <scm>
+        <url>https://github.com/luidmidev/apache-poi-improvements.git</url>
+        <connection>scm:git:git://github.com/luidmidev/apache-poi-improvements.git</connection>
+        <developerConnection>scm:git:sshl://github.com/luidmidev/apache-poi-improvements.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

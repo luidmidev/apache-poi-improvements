@@ -88,7 +88,7 @@ class TestWorkbook {
         System.out.println("Time on create workbook: " + (System.currentTimeMillis() - c));
 
         var d = System.currentTimeMillis();
-        var workbookForReport = WorkbookListMapper.from(persons, wookbook, 3)
+        var workbookForReport = WorkbookListMapper.from(persons, wookbook, 3, 0)
                 .map((manager, configuration) -> configuration
                         .configureSheet(sheet -> sheet.setColumnWidth(0, 5000))
                         .onProgress((current, total) -> System.out.println("Progress: " + current + " of " + total))

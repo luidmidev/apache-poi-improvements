@@ -29,12 +29,12 @@ public class WorkbookListMapper<T> {
     }
 
     public WorkbookListMapper(List<T> data, WorkbookType type) {
-        this(data, new WorkbookManager(type), 0);
+        this(data, new WorkbookManager(type), 0, 0);
     }
 
-    public WorkbookListMapper(List<T> data, WorkbookManager existingWorkbook, int startRow) {
+    public WorkbookListMapper(List<T> data, WorkbookManager existingWorkbook, int startRow, int startColumn) {
         this.workbookManager = existingWorkbook;
-        this.configuration = new ListMapperConfiguration<>(data, workbookManager.getWorkbook(), startRow);
+        this.configuration = new ListMapperConfiguration<>(data, workbookManager.getWorkbook(), startRow, startColumn);
     }
 
     public WorkbookManager map(ListMapperConfigurator<T> configurator) throws WorkbookException {
@@ -49,8 +49,8 @@ public class WorkbookListMapper<T> {
         return new WorkbookListMapper<>(models);
     }
 
-    public static <T> WorkbookListMapper<T> from(List<T> models, WorkbookManager existingWorkbook, int startRow) {
-        return new WorkbookListMapper<>(models, existingWorkbook, startRow);
+    public static <T> WorkbookListMapper<T> from(List<T> models, WorkbookManager existingWorkbook, int startRow, int startColumn) {
+        return new WorkbookListMapper<>(models, existingWorkbook, startRow, startColumn);
     }
 
     @FunctionalInterface
@@ -63,6 +63,7 @@ public class WorkbookListMapper<T> {
         private final List<T> data;
         private final Workbook workbook;
         private final int startRow;
+        private final int startColumn;
 
         private CellStyle headerStyle;
         private final RowMapers<T> rowMapers = new RowMapers<>();
@@ -72,10 +73,11 @@ public class WorkbookListMapper<T> {
 
         private final Map<CellStylizer, CellStyle> computedStyles = new HashMap<>();
 
-        private ListMapperConfiguration(List<T> data, Workbook workbook, int startRow) {
+        private ListMapperConfiguration(List<T> data, Workbook workbook, int startRow, int startColumn) {
             this.data = data;
             this.startRow = startRow;
             this.workbook = workbook;
+            this.startColumn = startColumn;
         }
 
 
@@ -89,12 +91,12 @@ public class WorkbookListMapper<T> {
         }
 
         public ListMapperConfiguration<T> withColumn(String column, Function<T, Object> getter, CellStylizer stylizer) {
-            var style = computedStyles.computeIfAbsent(stylizer, (key) -> stylizer.build(workbook));
-            return withColumn(column, getter, (cell) -> cell.setCellStyle(style));
+            var style = computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
+            return withColumn(column, getter, cell -> cell.setCellStyle(style));
         }
 
         public ListMapperConfiguration<T> withHeaderStyle(CellStylizer stylizer) {
-            this.headerStyle = computedStyles.computeIfAbsent(stylizer, (key) -> stylizer.build(workbook));
+            this.headerStyle = computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
             return this;
         }
 
@@ -125,7 +127,7 @@ public class WorkbookListMapper<T> {
             var columns = rowMapers.getColumnNames();
 
             for (int i = 0; i < columns.size(); i++) {
-                var cellHeader = rowHeader.createCell(i);
+                var cellHeader = rowHeader.createCell(i + startColumn);
                 cellHeader.setCellValue(columns.get(i));
                 if (headerStyle != null) cellHeader.setCellStyle(headerStyle);
             }
@@ -146,7 +148,7 @@ public class WorkbookListMapper<T> {
             for (var j = 0; j < mappers.size(); j++) {
                 RowMapper<T> mapper = mappers.get(j);
 
-                var cell = row.createCell(j);
+                var cell = row.createCell(j + startColumn);
                 var value = mapper.get(model);
                 WorkbookManagerUtils.setCellValue(cell, value);
                 mapper.action().accept(cell);
