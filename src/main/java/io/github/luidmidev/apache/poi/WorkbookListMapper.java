@@ -80,6 +80,9 @@ public class WorkbookListMapper<T> {
             this.startColumn = startColumn;
         }
 
+        public CellStyle computeStyle(CellStylizer stylizer) {
+            return computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
+        }
 
         public ListMapperConfiguration<T> withColumn(String column, RowMapper.Getter<T> getter, Consumer<Cell> cellConfigurator) {
             rowMapers.add(column, getter, cellConfigurator);
@@ -91,7 +94,7 @@ public class WorkbookListMapper<T> {
         }
 
         public ListMapperConfiguration<T> withColumn(String column, RowMapper.Getter<T> getter, CellStylizer stylizer) {
-            var style = computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
+            var style = computeStyle(stylizer);
             return withColumn(column, getter, cell -> cell.setCellStyle(style));
         }
 
@@ -104,12 +107,12 @@ public class WorkbookListMapper<T> {
         }
 
         public ListMapperConfiguration<T> withColumn(String column, Function<T, Object> getter, CellStylizer stylizer) {
-            var style = computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
+            var style = computeStyle(stylizer);
             return withColumn(column, getter, cell -> cell.setCellStyle(style));
         }
 
         public ListMapperConfiguration<T> withHeaderStyle(CellStylizer stylizer) {
-            this.headerStyle = computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
+            this.headerStyle = computeStyle(stylizer);
             return this;
         }
 
