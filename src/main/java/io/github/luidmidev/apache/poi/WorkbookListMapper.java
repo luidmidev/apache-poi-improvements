@@ -81,13 +81,26 @@ public class WorkbookListMapper<T> {
         }
 
 
-        public ListMapperConfiguration<T> withColumn(String column, Function<T, Object> getter) {
+        public ListMapperConfiguration<T> withColumn(String column, RowMapper.Getter<T> getter, Consumer<Cell> cellConfigurator) {
+            rowMapers.add(column, getter, cellConfigurator);
+            return this;
+        }
+
+        public ListMapperConfiguration<T> withColumn(String column, RowMapper.Getter<T> getter) {
             return withColumn(column, getter, Functionals.consumerNoAction());
         }
 
+        public ListMapperConfiguration<T> withColumn(String column, RowMapper.Getter<T> getter, CellStylizer stylizer) {
+            var style = computedStyles.computeIfAbsent(stylizer, key -> stylizer.build(workbook));
+            return withColumn(column, getter, cell -> cell.setCellStyle(style));
+        }
+
         public ListMapperConfiguration<T> withColumn(String column, Function<T, Object> getter, Consumer<Cell> cellConfigurator) {
-            rowMapers.add(column, getter, cellConfigurator);
-            return this;
+            return withColumn(column, (model, rowIndex) -> getter.apply(model), cellConfigurator);
+        }
+
+        public ListMapperConfiguration<T> withColumn(String column, Function<T, Object> getter) {
+            return withColumn(column, getter, Functionals.consumerNoAction());
         }
 
         public ListMapperConfiguration<T> withColumn(String column, Function<T, Object> getter, CellStylizer stylizer) {
@@ -149,7 +162,7 @@ public class WorkbookListMapper<T> {
                 RowMapper<T> mapper = mappers.get(j);
 
                 var cell = row.createCell(j + startColumn);
-                var value = mapper.get(model);
+                var value = mapper.get(model, rowNum);
                 WorkbookManagerUtils.setCellValue(cell, value);
                 mapper.action().accept(cell);
             }

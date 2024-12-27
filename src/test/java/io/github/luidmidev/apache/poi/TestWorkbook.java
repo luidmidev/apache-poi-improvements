@@ -45,14 +45,7 @@ class TestWorkbook {
                         .withColumn("Phone", Person::phone, style)
                         .withHeaderStyle(style)
                         .forEachRow((row, person) -> WorkbookManagerUtils.adjustRowHeightByLines(row, manager.getEvaluator()))
-                        .configureSheet(sheet -> {
-                            sheet.autoSizeColumn(0);
-                            sheet.autoSizeColumn(1);
-                            sheet.autoSizeColumn(2);
-                            sheet.autoSizeColumn(3);
-                            sheet.autoSizeColumn(4);
-                            sheet.autoSizeColumn(5);
-                        })
+                        .configureSheet(sheet -> CellStylizer.autoSizeColumns(sheet, 0, 5, 1.1))
                 );
 
         try (workbookForReport) {
@@ -88,7 +81,7 @@ class TestWorkbook {
         System.out.println("Time on create workbook: " + (System.currentTimeMillis() - c));
 
         var d = System.currentTimeMillis();
-        var workbookForReport = WorkbookListMapper.from(persons, wookbook, 3, 0)
+        var workbookForReport = WorkbookListMapper.from(persons, wookbook, 3, 2)
                 .map((manager, configuration) -> configuration
                         .configureSheet(sheet -> sheet.setColumnWidth(0, 5000))
                         .onProgress((current, total) -> System.out.println("Progress: " + current + " of " + total))

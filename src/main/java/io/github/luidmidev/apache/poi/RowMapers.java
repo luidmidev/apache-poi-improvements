@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Represents a collection of RowMapper instances for a specific object type, allowing
@@ -46,10 +45,10 @@ public class RowMapers<T> implements Iterable<RowMapper<T>> {
      * and cell configurator action.
      *
      * @param column The name of the column to associate with this RowMapper.
-     * @param getter A function to retrieve the value from an instance of T.
+     * @param getter A function to retrieve the value from an instance of T, given the row index.
      * @param action A CellWorkbookConsumer action to style or format the cell.
      */
-    public void add(String column, Function<T, Object> getter, Consumer<Cell> action) {
+    public void add(String column, RowMapper.Getter<T> getter, Consumer<Cell> action) {
         mappers.add(new RowMapper<>(column, getter, action));
     }
 }

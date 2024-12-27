@@ -333,4 +333,14 @@ public class CellStylizer {
             return style == null ? workbook.createCellStyle() : style;
         }
     }
+
+    public static void autoSizeColumns(Sheet sheet, int startColumn, int endColumn, double widthMultiplier) {
+        for (int i = startColumn; i <= endColumn; i++) {
+            sheet.autoSizeColumn(i);
+            int width = (int) (sheet.getColumnWidth(i) * widthMultiplier);
+            if (width <= 65280) { //MAX COLUMN WIDTH
+                sheet.setColumnWidth(i, width);
+            }
+        }
+    }
 }
